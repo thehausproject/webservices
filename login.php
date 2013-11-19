@@ -27,7 +27,7 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"";
+	echo "{\"error\":\"Could not connect to database.\"}";
 }else{
 	// Connection is ok. Check that username and password match
 	$result = mysqli_query($con, "SELECT USERNAME, PASSWORD, AUTH_TOKEN FROM USER WHERE USERNAME = '" . $username . "'");

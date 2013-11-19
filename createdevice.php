@@ -29,15 +29,21 @@ if(is_null($passcode) || is_null($type)){
 }
 
 // Create connection
-$con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_haus");
+$con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_haus");
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"";
+	echo "{\"error\":\"Could not connect to database.\"}";
 }else{
-	// Connection is ok
+	// Check that passcode does not already exist
+	$result = mysqli_query($con, "SELECT ID FROM DEVICE WHERE PASSCODE = '" . $passcode . "'");
+	if($row = mysqli_fetch_array($result)){
+		echo "{\"error\":\"A device with this passcode already exists.\"}";
+		exit;
+	}
+
 	if($type == 'L'){
-		$insert_query = "INSERT INTO DEVICE (PASSCODE, TYPE) VALUES ('" . $passcode . "', '" . $type . "')";
+		$insert_query = "INSERT INTO DEVICE (PASSCODE, TYPE, STATE) VALUES ('" . $passcode . "', '" . $type . "', 'LOCKED')";
 	}else{
 		//  Implement in later cycles for temperatature
 		//	and video devices

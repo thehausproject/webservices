@@ -33,7 +33,7 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"";
+	echo "{\"error\":\"Could not connect to database.\"}";
 }else{
 	// Connection is ok. Check that there are no existing users with the
 	// same username or email

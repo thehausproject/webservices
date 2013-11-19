@@ -28,7 +28,7 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"";
+	echo "{\"error\":\"Could not connect to database.\"}";
 }else{
 	// Connection is ok. Check old password matches
 	$result = mysqli_query($con, "SELECT USERNAME, PASSWORD, EMAIL FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
