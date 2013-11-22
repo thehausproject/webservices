@@ -3,9 +3,7 @@ Title:	Delete Device
 Author:	Dylan Boltz
 Date:	11/21/2013
 
-The purpose of this code is to delete a user.  Deleteing a user also results in the deletion of all
-devices, device permissions, and access permissions associated with the user and the devices that
-the user owns.
+The purpose of this code is to delete a devic.
 
 -->
 
@@ -13,10 +11,10 @@ the user owns.
 
 // Get Query Parameters
 $user_token = $_GET['user_token'];
-$password = $_GET['password'];
+$device_id = $_GET['device_id'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($password)){
+if(is_null($user_token) || is_null($device_id)){
 	echo "{\"error\":\"Insufficient parameters provided.\"}";
 	exit;
 }
@@ -30,31 +28,24 @@ if (mysqli_connect_errno($con)){
 	exit;
 }
 
-// Check that token and password are correct
-$result = mysqli_query($con, "SELECT ID, PASSWORD FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
+// Check that token is correct
+$result = mysqli_query($con, "SELECT ID FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
 $id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$id = $row['ID'];
-	$db_password = $row['PASSWORD'];
-	$hashed_password = hash('sha256', $password);
-	if($db_password != $hashed_password){
-		echo "{\"error\":\"Incorrect password.\"}";
-		exit;
-	}
 }else{
 	echo "{\"error\":\"Invalid user token.\"}";
 	exit;
 }
 
-// Delete the user
-mysqli_query($con, "DELETE FROM USER WHERE ID = " . $id);
-
 // Delete devices owned by the user and the permissions related to the device
 $result = mysqli_query($con, "SELECT ID FROM DEVICE WHERE OWNER = " . $id);
-while($row = mysqli_fetch_array($result)){
+if($row = mysqli_fetch_array($result)){
 	$device_id = $row['ID'];
 	mysqli_query($con, "DELETE FROM DEVICE WHERE ID = " . $device_id);
 	mysqli_query($con, "DELETE FROM DEVICE_PERMISSION WHERE DEVICE_ID = " . $device_id);
+}else{
+	echo "{\"error\":\"User must own the device in order to delete it.\"}";
 }
 
 echo "{\"result\":\"success\"}";
