@@ -1,9 +1,9 @@
 <!--
-Title:	Post Device State
+Title:	Post Device Status
 Author:	Dylan Boltz
 Date:	11/21/2013
 
-The purpose of this code is to post a device state.
+The purpose of this code is to post a device status.
 
 -->
 
@@ -12,10 +12,10 @@ The purpose of this code is to post a device state.
 // Get Query Parameters
 $user_token = $_GET['user_token'];
 $device_id = $_GET['device_id'];
-$state = $_GET['state'];
+$status = $_GET['status'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($device_id) || is_null($state)){
+if(is_null($user_token) || is_null($device_id) || is_null($status)){
 	echo "{\"error\":\"Insufficient parameters provided.\"}";
 	exit;
 }
@@ -39,16 +39,9 @@ if($row = mysqli_fetch_array($result)){
 	exit;
 }
 
-// Get the device type and ensure that the state is valid
-$result = mysqli_query($con, "SELECT TYPE FROM DEVICE WHERE ID = '" . $device_id . "'");
-if($row = mysqli_fetch_array($result)){
-	$device_type = $row['TYPE'];
-	if($device_type == 'L'){
-		if($state != "LOCKED" && $state != "UNLOCKED"){
-			echo "{\"error\":\"Invalid state provided.\"}";
-		}
-	}
-}else{
+// Ensure that the device exists
+$result = mysqli_query($con, "SELECT ID FROM DEVICE WHERE ID = '" . $device_id . "'");
+if(!mysqli_fetch_array($result)){
 	echo "{\"error\":\"Invalid device ID provided.\"}";
 	exit;
 }
@@ -71,8 +64,14 @@ if($row = mysqli_fetch_array($result)){
 	exit;
 }
 
-// Update the device state
-mysqli_query($con, "UPDATE DEVICE SET STATE = '" . $state . "' WHERE ID = " . $device_id);
+// Check that the status provided is valid
+if($status != 'U' && $status != 'D' && $status != 'L'){
+	echo "{\"error\":\"Invalid state provided.\"}";
+	exit;
+}
+
+// Update the device status
+mysqli_query($con, "UPDATE DEVICE SET STATUS = '" . $status . "' WHERE ID = " . $device_id);
 echo "{\"result\":\"success.\"}";
 
 ?>
