@@ -51,7 +51,7 @@ while($row = mysqli_fetch_array($result)){
 	$status = $device_row['STATUS'];
 	$nickname = $device_row['NICKNAME'];
 	$state = $device_row['STATE'];
-	$last_checkin = new DateTime($device_row['LAST_CHECKIN']);
+	$last_checkin = strtotime($device_row['LAST_CHECKIN']);
 
 	// Use the owner value to get the username of the device owner
 	$user_info = mysqli_query($con, "SELECT USERNAME FROM USER WHERE ID = " . $owner);
@@ -60,7 +60,9 @@ while($row = mysqli_fetch_array($result)){
 
 	// Check that the device has checked in within the past two seconds and mark it as offline if it hasn't.
 	$current_date = new DateTime("now");
-	if($status != 'D' && $current_date - $last_checkin > 2){
+	$interval = $current_date - $last_checkin;
+	$seconds_diff = round((((($interval % 604800) % 86400) % 3600) % 60), 2);
+	if($status != 'D' && abs($seconds_diff) > 2){
 		mysqli_query($con, "UPDATE DEVICE SET STATUS = 'D' WHERE ID = '" . $device_id . "'");
 		$status = 'D';
 	}
