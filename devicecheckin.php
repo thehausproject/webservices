@@ -1,3 +1,8 @@
+
+
+<?php
+
+/*
 <!--
 Title:	Device Check In
 Author:	Dylan Boltz
@@ -6,8 +11,7 @@ Date:	11/24/2013
 The purpose of this code is to for a device to check in.
 
 -->
-
-<?php
+*/
 
 // Get Query Parameters
 $passcode = $_GET['passcode'];

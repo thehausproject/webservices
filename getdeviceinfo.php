@@ -1,3 +1,8 @@
+
+
+<?php
+
+/*
 <!--
 Title:	Get Device Info
 Author:	Dylan Boltz
@@ -7,8 +12,7 @@ The purpose of this code is to return device information for the devices
 that a user has permission to see.
 
 -->
-
-<?php
+*/
 
 // Get Query Parameters
 $user_token = $_GET['user_token'];
