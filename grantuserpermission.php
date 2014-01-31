@@ -133,11 +133,21 @@ if($expiration_date != "NULL"){
 	}
 }
 
+// If a permission already exists for this user for this device, then delete it and create this new one
+$isupdate = false;
+$id = -1;
+$result = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE USER_ID = '" . $granted_user_id . 
+	"' AND DEVICE_ID = '" . $device_id . "'");
+if($row = mysqli_fetch_array($result)){
+	$id = $row['ID'];
+	$isupdate = true;
+}
+
 // Check that access code is valid and does not exist for another user of the device
 if($device_type == 'L'){
 	if(strlen($access_code) == 8){
 		$result = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE ACCESS_CODE = '" . $access_code . 
-			"' AND DEVICE_ID = '" . $device_id . "'");
+			"' AND DEVICE_ID = '" . $device_id . "' AND ID != " . $id);
 		if(mysqli_fetch_array($result)){
 			echo json_encode(array('error' => 'Identical access code already exists for another user of this device'));
 			exit;
@@ -148,17 +158,17 @@ if($device_type == 'L'){
 	}
 }
 
-// If a permission already exists for this user for this device, then delete it and create this new one
-$result = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE USER_ID = '" . $granted_user_id . 
-	"' AND DEVICE_ID = '" . $device_id . "'");
-if($row = mysqli_fetch_array($result)){
-	$id = $row['ID'];
-	mysqli_query($con, "DELETE FROM DEVICE_PERMISSION WHERE ID = " . $id);
+// Execute this code if the record is being updated and not created new
+if($isupdate){
+	mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = '" . $permission_level . "', ACCESS_EXPIRATION_DATE = '" .
+	$expiration_date . "', ACCESS_GRANTED_BY = " . $user_id . ", ACCESS_CODE = '" . $access_code . "' WHERE ID = " . $id);
+	echo json_encode(array('result' => 'success'));
+	exit;
 }
 
 // Finally.  If we made it this far it means that the device permission is ready to be written.
 $insert_query = "INSERT INTO DEVICE_PERMISSION (USER_ID, DEVICE_ID, PERMISSION, ACCESS_EXPIRATION_DATE, 
-	ACCESS_GRANTED_BY, ACCESS_CODE) VALUES (" . $user_id . ", " . $device_id . ", '" . $permission_level .
+	ACCESS_GRANTED_BY, ACCESS_CODE) VALUES (" . $granted_user_id . ", " . $device_id . ", '" . $permission_level .
 	"', '" . $expiration_date . "', " . $user_id . ", ";
 if($access_code == "NULL"){
 	$insert_query = $insert_query . $access_code;

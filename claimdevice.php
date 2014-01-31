@@ -63,13 +63,21 @@ if (mysqli_connect_errno($con)){
 	}
 
 	// Create the administrative device permission for the device owner
-	$url = "http://www.dylanboltz.com/haus/grantuserpermission.php?username=" . $username . "&user_token=" . $user_token . "&device_id=" .
-		$device_id . "&permission_level=A";
+	$url = "http://www.dylanboltz.com/haus/grantuserpermission.php";
+	$postvars = "username=" . $username . "&user_token=" . $user_token . "&device_id=" . $device_id . "&permission_level=A";
 	if($device_type == 'L'){
-		$url = $url . "&access_code=99999999";
+		$postvars = $postvars . "&access_code=99999999";
 	}
-	include $url;
+	
+	$ch = curl_init( $url );
+	curl_setopt( $ch, CURLOPT_POST, 1);
+	curl_setopt( $ch, CURLOPT_POSTFIELDS, $postvars);
+	curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+	curl_setopt( $ch, CURLOPT_HEADER, 0);
+	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
 
+	$response = curl_exec( $ch );
+	echo $response;
 }
 
 mysqli_close($con);
