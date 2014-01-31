@@ -1,4 +1,6 @@
-<!--
+<?php
+
+/*
 Title:	Delete Device
 Author:	Dylan Boltz
 Date:	11/21/2013
@@ -7,17 +9,15 @@ The purpose of this code is to delete a user.  Deleteing a user also results in 
 devices, device permissions, and access permissions associated with the user and the devices that
 the user owns.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$user_token = $_GET['user_token'];
-$password = $_GET['password'];
+$user_token = $_POST['user_token'];
+$password = $_POST['password'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($password)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -26,7 +26,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 	exit;
 }
 
@@ -38,11 +38,11 @@ if($row = mysqli_fetch_array($result)){
 	$db_password = $row['PASSWORD'];
 	$hashed_password = hash('sha256', $password);
 	if($db_password != $hashed_password){
-		echo "{\"error\":\"Incorrect password.\"}";
+		echo json_encode(array('error' => 'Incorrect password'));
 		exit;
 	}
 }else{
-	echo "{\"error\":\"Invalid user token.\"}";
+	echo json_encode(array('error' => 'Invalid user token'));
 	exit;
 }
 
@@ -57,6 +57,6 @@ while($row = mysqli_fetch_array($result)){
 	mysqli_query($con, "DELETE FROM DEVICE_PERMISSION WHERE DEVICE_ID = " . $device_id);
 }
 
-echo "{\"result\":\"success\"}";
+echo json_encode(array('result' => 'success'));
 
 ?>

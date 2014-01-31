@@ -1,22 +1,22 @@
-<!--
+<?php
+
+/*
 Title:	Change Password
 Author:	Dylan Boltz
 Date:	11/16/2013
 
 The purpose of this code is change a user's password to the new one provided.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$user_token = $_GET['user_token'];
-$old_password = $_GET['old_password'];
-$new_password = $_GET['new_password'];
+$user_token = $_POST['user_token'];
+$old_password = $_POST['old_password'];
+$new_password = $_POST['new_password'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($old_password) || is_null($new_password)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -28,7 +28,7 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 }else{
 	// Connection is ok. Check old password matches
 	$result = mysqli_query($con, "SELECT USERNAME, PASSWORD, EMAIL FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
@@ -39,12 +39,12 @@ if (mysqli_connect_errno($con)){
 			$update_query = "UPDATE USER SET PASSWORD = '" . $hashed_new_password . "', AUTH_TOKEN = '" . $new_user_token .
 				"' WHERE USERNAME = '" . $row['USERNAME'] . "'";
 			mysqli_query($con, $update_query);
-			echo "{\"user_token\":" . $new_user_token . "}";
+			echo json_encode(array('user_token' => $new_user_token));
 		}else{
-			echo "{\"error\":\"Existing password supplied is incorrect.\"}";
+			echo json_encode(array('error' => 'Existing password supplied is incorrect'));
 		}
 	}else{
-		echo "{\"error\":\"User does not exist.\"}";
+		echo json_encode(array('error' => 'User token is incorrect'));
 	}
 }
 

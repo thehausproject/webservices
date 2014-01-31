@@ -1,22 +1,22 @@
-<!--
+<?php
+
+/*
 Title:	Claim Device
 Author:	Dylan Boltz
 Date:	11/19/2013
 
 The purpose of this code is to allow a user to claim their registered devices.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$user_token = $_GET['user_token'];
-$passcode = $_GET['passcode'];
-$nickname = $_GET['nickname'];
+$user_token = $_POST['user_token'];
+$passcode = $_POST['passcode'];
+$nickname = $_POST['nickname'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($passcode) || is_null($nickname)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -25,7 +25,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 }else{
 	// Retrieve user id based on the user token
 	$result = mysqli_query($con, "SELECT ID, USERNAME FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
@@ -35,7 +35,7 @@ if (mysqli_connect_errno($con)){
 		$user_id = $row['ID'];
 		$username = $row['USERNAME'];
 	}else{
-		echo "{\"error\":\"User token is invalid.\"}";
+		echo json_encode(array('error' => 'User token is invalid'));
 		exit;
 	}
 
@@ -49,7 +49,7 @@ if (mysqli_connect_errno($con)){
 		$owner = $row['OWNER'];
 		$device_type = $row['TYPE'];
 	}else{
-		echo "{\"error\":\"Passcode is invalid.\"}";
+		echo json_encode(array('error' => 'Passcode is invalid'));
 		exit;
 	}
 
@@ -58,7 +58,7 @@ if (mysqli_connect_errno($con)){
 		mysqli_query($con, "UPDATE DEVICE SET OWNER = " . intval($user_id) . ", NICKNAME = '" . $nickname .
 			"' WHERE PASSCODE = '" . $passcode . "'");
 	}else{
-		echo "{\"error\":\"Device has already been claimed.\"}";
+		echo json_encode(array('error' => 'Device has already been claimed'));
 		exit;
 	}
 

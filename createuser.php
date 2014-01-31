@@ -1,4 +1,6 @@
-<!--
+<?php
+
+/*
 Title:	Create User
 Author:	Dylan Boltz
 Date:	11/16/2013
@@ -10,19 +12,17 @@ Validations performed:
 	-- Query parameters are not null
 	-- Identical username or email do not already exist for another user
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$username = $_GET['username'];
-$password = $_GET['password'];
-$email = $_GET['email'];
+$username = $_POST['username'];
+$password = $_POST['password'];
+$email = $_POST['email'];
 
 
 // Check that parameters are not null
 if(is_null($username) || is_null($password) || is_null($email)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -33,13 +33,13 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 }else{
 	// Connection is ok. Check that there are no existing users with the
 	// same username or email
 	$result = mysqli_query($con, "SELECT * FROM USER WHERE USERNAME = '" . $username . "' OR EMAIL = '" . $email . "'");
 	if(mysqli_fetch_array($result)){
-		echo "{\"error\":\"A user with this username or email already exists.\"}";
+		echo json_encode(array('error' => 'A user with this username or email already exists'));
 	}else{
 		// No existing users. Create the new user in the database.
 		$auth_key = hash('sha256', $username . $password . $email);
@@ -47,7 +47,7 @@ if (mysqli_connect_errno($con)){
 		$result = mysqli_query($con, $insert_query);
 
 		// Returns the user authorization token.
-		echo "{\"auth_key\":" . $auth_key . "}";
+		echo json_encode(array('auth_key' => $auth_key));
 	}
 }
 

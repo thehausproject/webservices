@@ -1,21 +1,21 @@
-<!--
+<?php
+
+/*
 Title:	Post Device Updates
 Author:	Dylan Boltz
 Date:	11/24/2013
 
 The purpose of this code is to for a device to post updates about its current state.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$passcode = $_GET['passcode'];
-$access_code = $_GET['access_code'];
+$passcode = $_POST['passcode'];
+$access_code = $_POST['access_code'];
 
 // Check that parameters are not null
 if(is_null($passcode) || is_null($access_code)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -24,7 +24,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 	exit;
 }
 
@@ -33,7 +33,7 @@ $device_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$device_id = $row['ID'];
 }else{
-	echo "{\"error\":\"No device with this passcode.\"}";
+	echo json_encode(array('error' => 'No device with this passcode'));
 	exit;
 }
 
@@ -42,9 +42,9 @@ $result = mysqli_query($con, "SELECT ACCESS_CODE FROM DEVICE_PERMISSION WHERE DE
 	"' AND ACCESS_CODE = '" . $access_code . "'");
 if($row = mysqli_fetch_array($result)){
 	mysqli_query($con, "UPDATE DEVICE SET STATE = 'UNLOCKED' WHERE ID = '" . $device_id . "'");
-	echo "{\"result\":\"success\"}";
+	echo json_encode(array('result' => 'success'));
 }else{
-	echo "{\"error\":\"Invalid access code.\"}";
+	echo json_encode(array('error' => 'Invalid access code'));
 	exit;
 }
 

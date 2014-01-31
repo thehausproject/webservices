@@ -1,29 +1,29 @@
-<!--
+<?php
+
+/*
 Title:	Create Device
 Author:	Dylan Boltz
 Date:	11/19/2013
 
 The purpose of this code is to create a device.  This is called when a new device is plugged in.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$passcode = $_GET['passcode'];
-$type = $_GET['type'];
+$passcode = $_POST['passcode'];
+$type = $_POST['type'];
 
 // Check that parameters are not null
 if(is_null($passcode) || is_null($type)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }else if(strlen($passcode) != 16){
-	echo "{\"error\":\"Invalid passcode.\"}";
+	echo json_encode(array('error' => 'Invalid passcode'));
 	exit;
 }else{
 	// Check that the type is valid
 	if($type != 'T' && $type != 'L' && $type != 'V'){
-		echo "{\"error\":\"Invalid type.\"}";
+		echo json_encode(array('error' => 'Invalid type'));
 	exit;
 	}
 }
@@ -33,12 +33,12 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 }else{
 	// Check that passcode does not already exist
 	$result = mysqli_query($con, "SELECT ID FROM DEVICE WHERE PASSCODE = '" . $passcode . "'");
 	if($row = mysqli_fetch_array($result)){
-		echo "{\"error\":\"A device with this passcode already exists.\"}";
+		echo json_encode(array('error' => 'A device with this passcode already exists'));
 		exit;
 	}
 
@@ -50,7 +50,7 @@ if (mysqli_connect_errno($con)){
 	}
 	
 	mysqli_query($con, $insert_query);
-	echo "{\"result\":\"success\"}";
+	echo json_encode(array('result' => 'success'));
 }
 
 mysqli_close($con);

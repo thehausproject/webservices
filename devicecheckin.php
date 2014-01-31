@@ -3,14 +3,12 @@
 <?php
 
 /*
-<!--
 Title:	Device Check In
 Author:	Dylan Boltz
 Date:	11/24/2013
 
 The purpose of this code is to for a device to check in.
 
--->
 */
 
 // Get Query Parameters
@@ -18,7 +16,7 @@ $passcode = $_GET['passcode'];
 
 // Check that parameters are not null
 if(is_null($passcode)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -27,7 +25,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 	exit;
 }
 
@@ -40,11 +38,11 @@ if($row = mysqli_fetch_array($result)){
 	$device_type = $row['TYPE'];
 	$device_state = $row['STATE'];
 }else{
-	echo "{\"error\":\"No device with this passcode.\"}";
+	echo json_encode(array('error' => 'No device with this passcode'));
 	exit;
 }
 
-echo "{\"state\":\"" . $device_state . "\"}";
+echo json_encode(array('state' => $device_state));
 
 if($device_type == 'L'){
 	if($device_state == "UNLOCKED"){

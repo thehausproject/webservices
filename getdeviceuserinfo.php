@@ -1,4 +1,6 @@
-<!--
+<?php
+
+/*
 Title:	Get Device User Info
 Author:	Dylan Boltz
 Date:	11/24/2013
@@ -6,9 +8,7 @@ Date:	11/24/2013
 The purpose of this code is to return information about all
 the user permissions associated with the device.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
 $device_id = $_GET['device_id'];
@@ -16,7 +16,7 @@ $user_token = $_GET['user_token'];
 
 // Check that parameters are not null
 if(is_null($device_id) || is_null($user_token)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -25,7 +25,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 	exit;
 }
 
@@ -35,7 +35,7 @@ $requesting_user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$requesting_user_id = $row['ID'];
 }else{
-	echo "{\"error\":\"Invalid user token.\"}";
+	echo json_encode(array('error' => 'Invalid user token'));
 	exit;
 }
 
@@ -44,18 +44,18 @@ $result = mysqli_query($con, "SELECT PERMISSION FROM DEVICE_PERMISSION WHERE USE
 if($row = mysqli_fetch_array($result)){
 	$requesting_user_permission = $row['PERMISSION'];
 	if($requesting_user_permission != 'A'){
-		echo "{\"error\":\"User with this token does not have permission to view device user permissions.\"}";
+		echo json_encode(array('error' => 'User with this token does not have permission to view device user permissions'));
 		exit;
 	}
 }else{
-	echo "{\"error\":\"User with this token does not have permission to view device user permissions.\"}";
+	echo json_encode(array('error' => 'User with this token does not have permission to view device user permissions'));
 	exit;
 }
 
 // Get and return all the associated device permissions
 $result = mysqli_query($con, "SELECT ID, USER_ID, PERMISSION, DATE_AUTHORIZED, ACCESS_EXPIRATION_DATE, " . 
 	"ACCESS_GRANTED_BY, ACCESS_CODE FROM DEVICE_PERMISSION WHERE DEVICE_ID = " . $device_id);
-echo "{\"permissions\":[";
+$json_array = array();
 $count = 0;
 while($row = mysqli_fetch_array($result)){
 	$permission_id = $row['ID'];
@@ -84,16 +84,12 @@ while($row = mysqli_fetch_array($result)){
 		$granted_by_username = "User does not exist";
 	}
 
-	// Return the permissions for the current user of the device
-	if($count != 0){
-		echo ",";
-	}
-	echo "{\"id\":" . $permission_id . ",\"user\":\"" . $username . "\",\"permission\":\"" . $permission . 
-		"\",\"date_authorized\":\"" . $date_authorized . "\",\"access_expiration_date\":\"" . $access_expiration_date . 
-		"\",\"access_granted_by\":\"" . $state . "\"}";
+	array_push($json_array, array('id' => $permission_id, 'user' => $username, 'permission' => $permission,
+		'date_authorized' => $date_authorized, 'access_expiration_date' => $access_expiration_date,
+		'access_granted_by' => $granted_by_username));
 	$count++;
 }
 
-echo "]}";
+echo json_encode(array('permissions' => $json_array));
 
 ?>

@@ -1,9 +1,6 @@
-
-
 <?php
 
 /*
-<!--
 Title:	Get Device Info
 Author:	Dylan Boltz
 Date:	11/24/2013
@@ -11,7 +8,6 @@ Date:	11/24/2013
 The purpose of this code is to return device information for the devices
 that a user has permission to see.
 
--->
 */
 
 // Get Query Parameters
@@ -19,7 +15,7 @@ $user_token = $_GET['user_token'];
 
 // Check that parameters are not null
 if(is_null($user_token)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -28,7 +24,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 	exit;
 }
 
@@ -38,13 +34,13 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	echo "{\"error\":\"Invalid token.\"}";
+	echo json_encode(array('error' => 'Invalid token'));
 	exit;
 }
 
 // Get the devices that the user has permissions for and return this device information
 $result = mysqli_query($con, "SELECT DEVICE_ID FROM DEVICE_PERMISSION WHERE USER_ID = " . $user_id);
-echo "{\"devices\":[";
+$json_array = array();
 $count = 0;
 while($row = mysqli_fetch_array($result)){
 	$device_id = $row['DEVICE_ID'];
@@ -72,15 +68,12 @@ while($row = mysqli_fetch_array($result)){
 	}
 
 	// Send back the device information in JSON format
-	if($count != 0){
-		echo ",";
-	}
-	echo "{\"id\":" . $device_id . ",\"owner\":\"" . $username . "\",\"type\":\"" . $type . "\",\"status\":\"" . $status .
-		"\",\"nickname\":\"" . $nickname . "\",\"state\":\"" . $state . "\"}";
+	array_push($json_array, array('id' => $device_id, 'owner' => $username, 'type' => $type, 'status' => $status,
+		'nickname' => $nickname, 'state' => $state));
 	$count++;
 
 }
 
-echo "]}";
+echo json_encode(array('devices' => $json_array));
 
 ?>

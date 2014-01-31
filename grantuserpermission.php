@@ -1,26 +1,26 @@
-<!--
+<?php
+
+/*
 Title:	Grant User Permission
 Author:	Dylan Boltz
 Date:	11/21/2013
 
 The purpose of this code is to grant a user permission for a device.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$username = $_GET['username'];
-$user_token = $_GET['user_token'];
-$device_id = $_GET['device_id'];
-$permission_level = $_GET['permission_level'];
-$expiration_date = $_GET['expiration_date'];
-$access_code = $_GET['access_code'];
+$username = $_POST['username'];
+$user_token = $_POST['user_token'];
+$device_id = $_POST['device_id'];
+$permission_level = $_POST['permission_level'];
+$expiration_date = $_POST['expiration_date'];
+$access_code = $_POST['access_code'];
 
 // Check that parameters are not null
 if(is_null($username) || is_null($user_token) || is_null($device_id) || 
 	is_null($permission_level)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -38,7 +38,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 	exit;
 }
 
@@ -50,7 +50,7 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	echo "{\"error\":\"Invalid user token.\"}";
+	echo json_encode(array('error' => 'Invalid user token'));
 	exit;
 }
 
@@ -62,7 +62,7 @@ if($row = mysqli_fetch_array($result)){
 	$device_owner = $row['OWNER'];
 	$device_type = $row['TYPE'];
 }else{
-	echo "{\"error\":\"Invalid device ID.\"}";
+	echo json_encode(array('error' => 'Invalid device ID'));
 	exit;
 }
 
@@ -75,18 +75,18 @@ if($row = mysqli_fetch_array($result)){
 	$user_permission = $row['PERMISSION'];
 	$user_expiration_date = $row['ACCESS_EXPIRATION_DATE'];
 	if($user_permission != 'A'){
-		echo "{\"error\":\"User does not have permission to grant access.\"}";
+		echo json_encode(array('error' => 'User does not have permission to grant access'));
 		exit;
 	}
 }
 
 // If user is administrator, check that the permission has not expired
 $current_date = NULL;
-if($user_permission == 'A' && !is_null($user_expiration_date)){
+if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiration_date != '0000-00-00'){
 	$expiration_date_obj = new DateTime($user_expiration_date);
 	$current_date = new DateTime("now");
 	if($current_date > $expiration_date_obj){
-		echo "{\"error\":\"User does not have permission to grant access.\"}";
+		echo json_encode(array('error' => 'User does not have permission to grant access'));
 		// And update permission in table to 'E' for expired
 		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE USER_ID = '" . $user_id .
 			"' AND DEVICE_ID = '" . $device_id . "')");
@@ -97,7 +97,7 @@ if($user_permission == 'A' && !is_null($user_expiration_date)){
 // If user granting access is not administrator, check that the user owns the device
 if(is_null($user_permission)){
 	if(intval($user_id) != intval($device_owner)){
-		echo "{\"error\":\"User does not have permission to grant access.\"}";
+		echo json_encode(array('error' => 'User does not have permission to grant access'));
 		exit;
 	}
 }
@@ -108,13 +108,13 @@ $granted_user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$granted_user_id = $row['ID'];
 }else{
-	echo "{\"error\":\"User " . $username . " does not exist.\"}";
+	echo json_encode(array('error' => $username . ' does not exist'));
 	exit;
 }
 
 // Check that permission level value is valid
 if($permission_level != 'A' && $permission_level != 'R' && $permission_level != 'W'){
-	echo "{\"error\":\"Invalid permision level.\"}";
+	echo json_encode(array('error' => 'Invalid permission level'));
 	exit;
 }
 
@@ -123,12 +123,12 @@ if($expiration_date != "NULL"){
 	if(preg_match('#^(?P<year>\d{2}|\d{4})([- /.])(?P<month>\d{1,2})\2(?P<day>\d{1,2})$#', $expiration_date, $matches)
 	           && checkdate($matches['month'],$matches['day'],$matches['year'])){
 		$expiration_date_obj = new DateTime($expiration_date);
-		if($expiration_date_obj > $current_date){
-			echo "{\"error\":\"Expiration date is invalid. Date has already passed.\"}";
+		if($current_date > $expiration_date_obj){
+			echo json_encode(array('error' => 'Expiration date has already passed'));
 			exit;
 		}
 	}else{
-		echo "{\"error\":\"Expiration date format is invalid. Use MySQL format.\"}";
+		echo json_encode(array('error' => 'Expiration date must be in MySQL format'));
 		exit;
 	}
 }
@@ -139,11 +139,11 @@ if($device_type == 'L'){
 		$result = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE ACCESS_CODE = '" . $access_code . 
 			"' AND DEVICE_ID = '" . $device_id . "'");
 		if(mysqli_fetch_array($result)){
-			echo "{\"error\":\"Identical access code already exists for another user of this device.\"}";
+			echo json_encode(array('error' => 'Identical access code already exists for another user of this device'));
 			exit;
 		}
 	}else{
-		echo "{\"error\":\"Access code must be exactly 8 characters in length.\"}";
+		echo json_encode(array('error' => 'Access code must be exactly 8 characters in length'));
 		exit;
 	}
 }
@@ -168,6 +168,6 @@ if($access_code == "NULL"){
 $insert_query = $insert_query . ")";
 
 mysqli_query($con, $insert_query);
-echo "{\"result\":\"success\"}";
+echo json_encode(array('result' => 'success'));
 
 ?>

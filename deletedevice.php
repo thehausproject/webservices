@@ -1,21 +1,21 @@
-<!--
+<?php
+
+/*
 Title:	Delete Device
 Author:	Dylan Boltz
 Date:	11/21/2013
 
 The purpose of this code is to delete a devic.
 
--->
-
-<?php
+*/
 
 // Get Query Parameters
-$user_token = $_GET['user_token'];
-$device_id = $_GET['device_id'];
+$user_token = $_POST['user_token'];
+$device_id = $_POST['device_id'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($device_id)){
-	echo "{\"error\":\"Insufficient parameters provided.\"}";
+	echo json_encode(array('error' => 'Insufficient parameters provided'));
 	exit;
 }
 
@@ -24,7 +24,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo "{\"error\":\"Could not connect to database.\"}";
+	echo json_encode(array('error' => 'Could not connect to database'));
 	exit;
 }
 
@@ -34,7 +34,7 @@ $id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$id = $row['ID'];
 }else{
-	echo "{\"error\":\"Invalid user token.\"}";
+	echo json_encode(array('error' => 'Invalid user token'));
 	exit;
 }
 
@@ -45,9 +45,9 @@ if($row = mysqli_fetch_array($result)){
 	mysqli_query($con, "DELETE FROM DEVICE WHERE ID = " . $device_id);
 	mysqli_query($con, "DELETE FROM DEVICE_PERMISSION WHERE DEVICE_ID = " . $device_id);
 }else{
-	echo "{\"error\":\"User must own the device in order to delete it.\"}";
+	echo json_encode(array('error' => 'User must own the device in order to delete it'));
 }
 
-echo "{\"result\":\"success\"}";
+echo json_encode(array('result' => 'success'));
 
 ?>
