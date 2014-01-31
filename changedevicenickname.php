@@ -9,6 +9,8 @@ The purpose of this code is to allow a user to claim their registered devices.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $device_id = $_POST['device_id'];
 $user_token = $_POST['user_token'];
@@ -19,8 +21,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
-	exit;
+	output_error('Could not connect to database');
 }
 
 $result = mysqli_query($con, "SELECT ID FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
@@ -28,20 +29,17 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	echo json_encode(array('error' => 'User token is invalid'));
-	exit;
+	output_error('User token is invalid');
 }
 
 $result = mysqli_query($con, "SELECT OWNER FROM DEVICE WHERE ID = '" . $device_id . "'");
 if($row = mysqli_fetch_array($result)){
 	$owner = $row['OWNER'];
 	if(intval($owner) != intval($user_id)){
-		echo json_encode(array('error' => 'User must be the device owner to change the nickname'));
-		exit;
+		output_error('User must be the device owner to change the nickname');
 	}
 }else{
-	echo json_encode(array('error' => 'Invalid device ID'));
-	exit;
+	output_error('Invalid device ID');
 }
 
 $update_query = "UPDATE DEVICE SET NICKNAME = '" . $new_nickname . "' WHERE ID = " . $device_id;

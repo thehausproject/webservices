@@ -9,6 +9,8 @@ The purpose of this code is to grant a user permission for a device.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $username = $_POST['username'];
 $user_token = $_POST['user_token'];
@@ -20,8 +22,7 @@ $access_code = $_POST['access_code'];
 // Check that parameters are not null
 if(is_null($username) || is_null($user_token) || is_null($device_id) || 
 	is_null($permission_level)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 // Check if the optional arguments are null so that the NULL string
@@ -38,8 +39,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
-	exit;
+	output_error('Could not connect to database');
 }
 
 // More preliminary error checking to follow
@@ -50,8 +50,7 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	echo json_encode(array('error' => 'Invalid user token'));
-	exit;
+	output_error('Invalid user token');
 }
 
 // Check that device id is valid
@@ -62,8 +61,7 @@ if($row = mysqli_fetch_array($result)){
 	$device_owner = $row['OWNER'];
 	$device_type = $row['TYPE'];
 }else{
-	echo json_encode(array('error' => 'Invalid device ID'));
-	exit;
+	output_error('Invalid device ID');
 }
 
 // Check if user granting permission is administrator
@@ -75,8 +73,7 @@ if($row = mysqli_fetch_array($result)){
 	$user_permission = $row['PERMISSION'];
 	$user_expiration_date = $row['ACCESS_EXPIRATION_DATE'];
 	if($user_permission != 'A'){
-		echo json_encode(array('error' => 'User does not have permission to grant access'));
-		exit;
+		output_error('User does not have permission to grant access');
 	}
 }
 
@@ -86,7 +83,7 @@ if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiratio
 	$expiration_date_obj = new DateTime($user_expiration_date);
 	$current_date = new DateTime("now");
 	if($current_date > $expiration_date_obj){
-		echo json_encode(array('error' => 'User does not have permission to grant access'));
+		output_error('User does not have permission to grant access');
 		// And update permission in table to 'E' for expired
 		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE USER_ID = '" . $user_id .
 			"' AND DEVICE_ID = '" . $device_id . "')");
@@ -97,8 +94,7 @@ if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiratio
 // If user granting access is not administrator, check that the user owns the device
 if(is_null($user_permission)){
 	if(intval($user_id) != intval($device_owner)){
-		echo json_encode(array('error' => 'User does not have permission to grant access'));
-		exit;
+		output_error('User does not have permission to grant access');
 	}
 }
 
@@ -114,8 +110,7 @@ if($row = mysqli_fetch_array($result)){
 
 // Check that permission level value is valid
 if($permission_level != 'A' && $permission_level != 'R' && $permission_level != 'W'){
-	echo json_encode(array('error' => 'Invalid permission level'));
-	exit;
+	output_error('Invalid permission level');
 }
 
 // Check that expiration date is valid
@@ -124,12 +119,10 @@ if($expiration_date != "NULL"){
 	           && checkdate($matches['month'],$matches['day'],$matches['year'])){
 		$expiration_date_obj = new DateTime($expiration_date);
 		if($current_date > $expiration_date_obj){
-			echo json_encode(array('error' => 'Expiration date has already passed'));
-			exit;
+			output_error('Expiration date has already passed');
 		}
 	}else{
-		echo json_encode(array('error' => 'Expiration date must be in MySQL format'));
-		exit;
+		output_error('Expiration date must be in MySQL format');
 	}
 }
 
@@ -149,12 +142,10 @@ if($device_type == 'L'){
 		$result = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE ACCESS_CODE = '" . $access_code . 
 			"' AND DEVICE_ID = '" . $device_id . "' AND ID != " . $id);
 		if(mysqli_fetch_array($result)){
-			echo json_encode(array('error' => 'Identical access code already exists for another user of this device'));
-			exit;
+			output_error('Identical access code already exists for another user of this device');
 		}
 	}else{
-		echo json_encode(array('error' => 'Access code must be exactly 8 characters in length'));
-		exit;
+		output_error('Access code must be exactly 8 characters in length');
 	}
 }
 

@@ -9,6 +9,8 @@ The purpose of this code is to post a device state.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $user_token = $_POST['user_token'];
 $device_id = $_POST['device_id'];
@@ -16,8 +18,7 @@ $state = $_POST['state'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($device_id) || is_null($state)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 // Create connection
@@ -25,8 +26,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
-	exit;
+	output_error('Could not connect to database');
 }
 
 // Get the user ID, ensuring that the user token is valid
@@ -35,8 +35,7 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	echo json_encode(array('error' => 'Invalid user token'));
-	exit;
+	output_error('Invalid user token');
 }
 
 // Get the device type and ensure that the state is valid
@@ -45,12 +44,11 @@ if($row = mysqli_fetch_array($result)){
 	$device_type = $row['TYPE'];
 	if($device_type == 'L'){
 		if($state != "LOCKED" && $state != "UNLOCKED"){
-			echo json_encode(array('error' => 'Invalid state provided'));
+			output_error('Invalid state provided');
 		}
 	}
 }else{
-	echo json_encode(array('error' => 'Invalid device ID provided'));
-	exit;
+	output_error('Invalid device ID provided');
 }
 
 // Verify that a permission exists for the user making the request
@@ -63,12 +61,10 @@ if($row = mysqli_fetch_array($result)){
 	$user_permission = $row['PERMISSION'];
 	//Check that the user permission is administrator or write
 	if($user_permission != 'A' && $user_permission != 'W'){
-		echo json_encode(array('error' => 'Permission level not high enough to perform this action'));
-		exit;
+		output_error('Permission level not high enough to perform this action');
 	}
 }else{
-	echo json_encode(array('error' => 'No permission granted to this user'));
-	exit;
+	output_error('No permission granted to this user');
 }
 
 // Update the device state

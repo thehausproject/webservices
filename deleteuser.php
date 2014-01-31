@@ -11,14 +11,15 @@ the user owns.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $user_token = $_POST['user_token'];
 $password = $_POST['password'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($password)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 // Create connection
@@ -26,8 +27,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
-	exit;
+	output_error('Could not connect to database');
 }
 
 // Check that token and password are correct
@@ -38,12 +38,10 @@ if($row = mysqli_fetch_array($result)){
 	$db_password = $row['PASSWORD'];
 	$hashed_password = hash('sha256', $password);
 	if($db_password != $hashed_password){
-		echo json_encode(array('error' => 'Incorrect password'));
-		exit;
+		output_error('Incorrect password');
 	}
 }else{
-	echo json_encode(array('error' => 'Invalid user token'));
-	exit;
+	output_error('Invalid user token');
 }
 
 // Delete the user

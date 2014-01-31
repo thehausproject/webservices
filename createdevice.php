@@ -9,22 +9,21 @@ The purpose of this code is to create a device.  This is called when a new devic
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $passcode = $_POST['passcode'];
 $type = $_POST['type'];
 
 // Check that parameters are not null
 if(is_null($passcode) || is_null($type)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }else if(strlen($passcode) != 16){
-	echo json_encode(array('error' => 'Invalid passcode'));
-	exit;
+	output_error('Invalid passcode');
 }else{
 	// Check that the type is valid
 	if($type != 'T' && $type != 'L' && $type != 'V'){
-		echo json_encode(array('error' => 'Invalid type'));
-	exit;
+		output_error('Invalid type');
 	}
 }
 
@@ -33,13 +32,12 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
+	output_error('Could not connect to database');
 }else{
 	// Check that passcode does not already exist
 	$result = mysqli_query($con, "SELECT ID FROM DEVICE WHERE PASSCODE = '" . $passcode . "'");
 	if($row = mysqli_fetch_array($result)){
-		echo json_encode(array('error' => 'A device with this passcode already exists'));
-		exit;
+		output_error('A device with this passcode already exists');
 	}
 
 	if($type == 'L'){

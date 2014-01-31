@@ -9,6 +9,8 @@ The purpose of this code is to post a device status.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $user_token = $_POST['user_token'];
 $device_id = $_POST['device_id'];
@@ -16,8 +18,7 @@ $status = $_POST['status'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($device_id) || is_null($status)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 // Create connection
@@ -25,8 +26,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
-	exit;
+	output_error('Could not connect to database');
 }
 
 // Get the user ID, ensuring that the user token is valid
@@ -35,15 +35,13 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	echo json_encode(array('error' => 'Invalid user token'));
-	exit;
+	output_error('Invalid user token');
 }
 
 // Ensure that the device exists
 $result = mysqli_query($con, "SELECT ID FROM DEVICE WHERE ID = '" . $device_id . "'");
 if(!mysqli_fetch_array($result)){
-	echo json_encode(array('error' => 'Invalid device ID provided'));
-	exit;
+	output_error('Invalid device ID provided');
 }
 
 // Verify that a permission exists for the user making the request
@@ -56,18 +54,15 @@ if($row = mysqli_fetch_array($result)){
 	$user_permission = $row['PERMISSION'];
 	//Check that the user permission is administrator or write
 	if($user_permission != 'A' && $user_permission != 'W'){
-		echo json_encode(array('error' => 'Permission level is not high enough to perform this action'));
-		exit;
+		output_error('Permission level is not high enough to perform this action');
 	}
 }else{
-	echo json_encode(array('error' => 'No permission granted to this user'));
-	exit;
+	output_error('No permission granted to this user');
 }
 
 // Check that the status provided is valid
 if($status != 'U' && $status != 'D' && $status != 'L'){
-	echo json_encode(array('error' => 'Invalid state provided'));
-	exit;
+	output_error('Invalid state provided');
 }
 
 // Update the device status

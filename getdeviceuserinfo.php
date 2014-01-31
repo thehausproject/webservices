@@ -10,14 +10,15 @@ the user permissions associated with the device.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $device_id = $_GET['device_id'];
 $user_token = $_GET['user_token'];
 
 // Check that parameters are not null
 if(is_null($device_id) || is_null($user_token)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 // Create connection
@@ -25,8 +26,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
-	exit;
+	output_error('Could not connect to database');
 }
 
 // Check that the user requesting this information is an administrator
@@ -35,8 +35,7 @@ $requesting_user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$requesting_user_id = $row['ID'];
 }else{
-	echo json_encode(array('error' => 'Invalid user token'));
-	exit;
+	output_error('Invalid user token');
 }
 
 $result = mysqli_query($con, "SELECT PERMISSION FROM DEVICE_PERMISSION WHERE USER_ID = " . $requesting_user_id
@@ -44,12 +43,10 @@ $result = mysqli_query($con, "SELECT PERMISSION FROM DEVICE_PERMISSION WHERE USE
 if($row = mysqli_fetch_array($result)){
 	$requesting_user_permission = $row['PERMISSION'];
 	if($requesting_user_permission != 'A'){
-		echo json_encode(array('error' => 'User with this token does not have permission to view device user permissions'));
-		exit;
+		output_error('User with this token does not have permission to view device user permissions');
 	}
 }else{
-	echo json_encode(array('error' => 'User with this token does not have permission to view device user permissions'));
-	exit;
+	output_error('User with this token does not have permission to view device user permissions');
 }
 
 // Get and return all the associated device permissions

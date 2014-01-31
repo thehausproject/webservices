@@ -10,14 +10,15 @@ correct login credentials were provided.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $username = $_POST['username'];
 $password = $_POST['password'];
 
 // Check that parameters are not null
 if(is_null($username) || is_null($password)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 $hashed_password = hash('sha256', $password);
@@ -27,7 +28,7 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
+	output_error('Could not connect to database');
 }else{
 	// Connection is ok. Check that username and password match
 	$result = mysqli_query($con, "SELECT USERNAME, PASSWORD, AUTH_TOKEN FROM USER WHERE USERNAME = '" . $username . "'");
@@ -36,10 +37,10 @@ if (mysqli_connect_errno($con)){
 		if($row['USERNAME'] == $username && $row['PASSWORD'] == $hashed_password){
 			echo json_encode(array('user_token' => $row['AUTH_TOKEN']));
 		}else{
-			echo json_encode(array('error' => 'Invalid username/password'));
+			output_error('Invalid username/password');
 		}
 	}else{
-		echo json_encode(array('error' => 'Invalid username/password'));
+		output_error('Invalid username/password');
 	}
 }
 

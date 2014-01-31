@@ -14,6 +14,8 @@ Validations performed:
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $username = $_POST['username'];
 $password = $_POST['password'];
@@ -22,8 +24,7 @@ $email = $_POST['email'];
 
 // Check that parameters are not null
 if(is_null($username) || is_null($password) || is_null($email)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 $hashed_password = hash('sha256', $password);
@@ -33,13 +34,13 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
+	output_error('Could not connect to database');
 }else{
 	// Connection is ok. Check that there are no existing users with the
 	// same username or email
 	$result = mysqli_query($con, "SELECT * FROM USER WHERE USERNAME = '" . $username . "' OR EMAIL = '" . $email . "'");
 	if(mysqli_fetch_array($result)){
-		echo json_encode(array('error' => 'A user with this username or email already exists'));
+		output_error('A user with this username or email already exists');
 	}else{
 		// No existing users. Create the new user in the database.
 		$auth_key = hash('sha256', $username . $password . $email);

@@ -10,13 +10,14 @@ that a user has permission to see.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $user_token = $_GET['user_token'];
 
 // Check that parameters are not null
 if(is_null($user_token)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 // Create connection
@@ -24,8 +25,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
-	exit;
+	output_error('Could not connect to database');
 }
 
 // Check that token is valid and get the user ID
@@ -34,8 +34,7 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	echo json_encode(array('error' => 'Invalid token'));
-	exit;
+	output_error('Invalid token');
 }
 
 // Get the devices that the user has permissions for and return this device information
@@ -75,6 +74,7 @@ while($row = mysqli_fetch_array($result)){
 
 }
 
+http_response_code(200);
 echo json_encode(array('devices' => $json_array));
 
 ?>

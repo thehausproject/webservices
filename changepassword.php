@@ -9,6 +9,8 @@ The purpose of this code is change a user's password to the new one provided.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $user_token = $_POST['user_token'];
 $old_password = $_POST['old_password'];
@@ -16,8 +18,7 @@ $new_password = $_POST['new_password'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($old_password) || is_null($new_password)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 $hashed_old_password = hash('sha256', $old_password);
@@ -28,7 +29,7 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
+	output_error('Could not connect to database');
 }else{
 	// Connection is ok. Check old password matches
 	$result = mysqli_query($con, "SELECT USERNAME, PASSWORD, EMAIL FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
@@ -41,10 +42,10 @@ if (mysqli_connect_errno($con)){
 			mysqli_query($con, $update_query);
 			echo json_encode(array('user_token' => $new_user_token));
 		}else{
-			echo json_encode(array('error' => 'Existing password supplied is incorrect'));
+			output_error('Existing password supplied is incorrect');
 		}
 	}else{
-		echo json_encode(array('error' => 'User token is incorrect'));
+		output_error('User token is incorrect');
 	}
 }
 

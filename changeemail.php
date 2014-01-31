@@ -9,6 +9,8 @@ The purpose of this code is change a user's email to the new one provided.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $user_token = $_POST['user_token'];
 $new_email = $_POST['new_email'];
@@ -16,8 +18,7 @@ $password = $_POST['password'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($new_email) || is_null($password)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 $hashed_password = hash('sha256', $password);
@@ -27,7 +28,7 @@ $con=mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_h
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
+	output_error('Could not connect to database');
 }else{
 	// Connection is ok. Check password matches
 	$result = mysqli_query($con, "SELECT USERNAME, PASSWORD, EMAIL FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
@@ -40,10 +41,10 @@ if (mysqli_connect_errno($con)){
 			mysqli_query($con, $update_query);
 			echo json_encode(array('user_token' => $new_user_token));
 		}else{
-			echo json_encode(array('error' => 'Incorrect password'));
+			output_error('Incorrect password');
 		}
 	}else{
-		echo json_encode(array('error' => 'User does not exist'));
+		output_error('User does not exist');
 	}
 }
 

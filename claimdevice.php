@@ -9,6 +9,8 @@ The purpose of this code is to allow a user to claim their registered devices.
 
 */
 
+include 'commonfunctions.php';
+
 // Get Query Parameters
 $user_token = $_POST['user_token'];
 $passcode = $_POST['passcode'];
@@ -16,8 +18,7 @@ $nickname = $_POST['nickname'];
 
 // Check that parameters are not null
 if(is_null($user_token) || is_null($passcode) || is_null($nickname)){
-	echo json_encode(array('error' => 'Insufficient parameters provided'));
-	exit;
+	output_error('Insufficient parameters provided');
 }
 
 // Create connection
@@ -25,7 +26,7 @@ $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1
 
 // Check connection
 if (mysqli_connect_errno($con)){
-	echo json_encode(array('error' => 'Could not connect to database'));
+	output_error('Could not connect to database');
 }else{
 	// Retrieve user id based on the user token
 	$result = mysqli_query($con, "SELECT ID, USERNAME FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
@@ -35,8 +36,7 @@ if (mysqli_connect_errno($con)){
 		$user_id = $row['ID'];
 		$username = $row['USERNAME'];
 	}else{
-		echo json_encode(array('error' => 'User token is invalid'));
-		exit;
+		output_error('User token is invalid');
 	}
 
 	// Check that device has not already been claimed
@@ -49,8 +49,7 @@ if (mysqli_connect_errno($con)){
 		$owner = $row['OWNER'];
 		$device_type = $row['TYPE'];
 	}else{
-		echo json_encode(array('error' => 'Passcode is invalid'));
-		exit;
+		output_error('Passcode is invalid');
 	}
 
 	// Update the devicee's owner and nickname
@@ -58,8 +57,7 @@ if (mysqli_connect_errno($con)){
 		mysqli_query($con, "UPDATE DEVICE SET OWNER = " . intval($user_id) . ", NICKNAME = '" . $nickname .
 			"' WHERE PASSCODE = '" . $passcode . "'");
 	}else{
-		echo json_encode(array('error' => 'Device has already been claimed'));
-		exit;
+		output_error('Device has already been claimed');
 	}
 
 	// Create the administrative device permission for the device owner
