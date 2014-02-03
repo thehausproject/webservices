@@ -16,6 +16,11 @@ $device_id = $_POST['device_id'];
 $user_token = $_POST['user_token'];
 $new_nickname = $_POST['new_nickname'];
 
+// Check that parameters are not null
+if(is_null($device_id) || is_null($user_token) || is_null($new_nickname)){
+	output_error('Insufficient parameters provided');
+}
+
 // Create connection
 $con = mysqli_connect("localhost","dylanbo1_haus","burningdownthehaus","dylanbo1_haus");
 

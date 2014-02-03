@@ -1,7 +1,7 @@
 <?php
 
 /*
-Title:	Delete Device
+Title:	Delete User
 Author:	Dylan Boltz
 Date:	11/21/2013
 

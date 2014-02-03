@@ -5,7 +5,7 @@ Title:	Delete Device
 Author:	Dylan Boltz
 Date:	11/21/2013
 
-The purpose of this code is to delete a devic.
+The purpose of this code is to delete a device.
 
 */
 

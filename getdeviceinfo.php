@@ -34,16 +34,17 @@ $user_id = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_id = $row['ID'];
 }else{
-	output_error('Invalid token');
+	output_error('Invalid user token');
 }
 
 // Get the devices that the user has permissions for and return this device information
-$result = mysqli_query($con, "SELECT DEVICE_ID, PERMISSION FROM DEVICE_PERMISSION WHERE USER_ID = " . $user_id);
+$result = mysqli_query($con, "SELECT DEVICE_ID, PERMISSION, ACCESS_CODE FROM DEVICE_PERMISSION WHERE USER_ID = " . $user_id);
 $json_array = array();
 $count = 0;
 while($row = mysqli_fetch_array($result)){
 	$device_id = $row['DEVICE_ID'];
 	$permission = $row['PERMISSION'];
+	$access_code = $row['ACCESS_CODE'];
 	$device_info = mysqli_query($con, "SELECT OWNER, TYPE, STATUS, NICKNAME, STATE, LAST_CHECKIN FROM DEVICE WHERE ID = " . $device_id);
 	$device_row = mysqli_fetch_array($device_info);
 	$owner = $device_row['OWNER'];
@@ -68,13 +69,16 @@ while($row = mysqli_fetch_array($result)){
 	}
 
 	// Send back the device information in JSON format
-	array_push($json_array, array('id' => $device_id, 'owner' => $username, 'type' => $type, 'status' => $status,
-		'nickname' => $nickname, 'state' => $state, 'permission' => $permission));
+	$device_properties = array('id' => $device_id, 'owner' => $username, 'type' => $type, 'status' => $status,
+		'nickname' => $nickname, 'state' => $state, 'permission' => $permission);
+	if($type == 'L'){
+		$device_properties['access_code'] = $access_code;
+	}
+	array_push($json_array, $device_properties);
 	$count++;
 
 }
 
-http_response_code(200);
 echo json_encode(array('devices' => $json_array));
 
 ?>

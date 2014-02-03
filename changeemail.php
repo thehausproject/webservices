@@ -44,7 +44,7 @@ if (mysqli_connect_errno($con)){
 			output_error('Incorrect password');
 		}
 	}else{
-		output_error('User does not exist');
+		output_error('Invalid user token');
 	}
 }
 

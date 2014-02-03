@@ -62,7 +62,7 @@ if($row = mysqli_fetch_array($result)){
 
 // Check that the status provided is valid
 if($status != 'U' && $status != 'D' && $status != 'L'){
-	output_error('Invalid state provided');
+	output_error('Invalid status provided');
 }
 
 // Update the device status
