@@ -83,11 +83,10 @@ if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiratio
 	$expiration_date_obj = new DateTime($user_expiration_date);
 	$current_date = new DateTime("now");
 	if($current_date > $expiration_date_obj){
-		output_error('User does not have permission to grant access');
 		// And update permission in table to 'E' for expired
 		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE USER_ID = '" . $user_id .
 			"' AND DEVICE_ID = '" . $device_id . "')");
-		exit;
+		output_error('User does not have permission to grant access');
 	}
 }
 
