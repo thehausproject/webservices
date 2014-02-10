@@ -166,8 +166,13 @@ if($access_code == "NULL"){
 	$insert_query = $insert_query . "'" . $access_code . "'";
 }
 $insert_query = $insert_query . ")";
-
 mysqli_query($con, $insert_query);
+
+// Create a device access record for this permission with all access granted by default
+$permission_id = mysqli_insert_id($con);
+$insert_query = "INSERT INTO DEVICE_ACCESS (DEVICE_PERMISSION_ID, ALL_ACCESS) VALUES (". $permission_id . ", 1)";
+mysqli_query($insert_query);
+
 echo json_encode(array('result' => 'success'));
 
 ?>

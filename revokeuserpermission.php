@@ -76,7 +76,23 @@ if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiratio
 }
 
 // Delete the permission record
-$result = mysqli_query($con, "DELETE FROM DEVICE_PERMISSION WHERE ID = '" . $permission_id . "'");
+mysqli_query($con, "DELETE FROM DEVICE_PERMISSION WHERE ID = '" . $permission_id . "'");
+
+// Delete any access records that existed for the permission in a cascading fashion
+$result = mysqli_query($con, "SELECT ID, ALL_ACCESS FROM DEVICE_ACCESS WHERE DEVICE_PERMISSION_ID = " . $permission_id);
+if($row = mysqli_fetch_array($result)){
+	if($row['ALL_ACCESS'] == '0'){
+		$result = mysqli_query($con, "SELECT ID, ALL_ACCESS FROM DEVICE_ACCESS_DAY WHERE DEVICE_ACCESS_ID = " . $row['ID']);
+		while($row2 = mysqli_fetch_array($result)){
+			if($row2['ALL_ACCESS'] == '0'){
+				mysqli_query($con, "DELETE FROM DEVICE_ACCESS_TIME WHERE ACCESS_DAY_ID = " . $row2['ID']);
+			}
+			mysqli_query($con, "DELETE FROM DEVICE_ACCESS_DAY WHERE ID = " . $row2['ID']);
+		}
+	}
+	mysqli_query($con, "DELETE FROM DEVICE_ACCESS WHERE ID = " . $row['ID']);
+}
+
 echo json_encode(array('result' => 'success'));
 
 ?>
