@@ -52,6 +52,10 @@ $result = mysqli_query($con, "SELECT ID FROM DEVICE WHERE OWNER = " . $id);
 while($row = mysqli_fetch_array($result)){
 	$device_id = $row['ID'];
 	mysqli_query($con, "DELETE FROM DEVICE WHERE ID = " . $device_id);
+	$result2 = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE DEVICE_ID = " . $device_id);
+	while($row2 = mysqli_fetch_array($result2)){
+		delete_permission_restrictions($con, $row2['ID']);
+	}
 	mysqli_query($con, "DELETE FROM DEVICE_PERMISSION WHERE DEVICE_ID = " . $device_id);
 }
 
