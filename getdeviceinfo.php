@@ -38,10 +38,11 @@ if($row = mysqli_fetch_array($result)){
 }
 
 // Get the devices that the user has permissions for and return this device information
-$result = mysqli_query($con, "SELECT DEVICE_ID, PERMISSION, ACCESS_CODE FROM DEVICE_PERMISSION WHERE USER_ID = " . $user_id);
+$result = mysqli_query($con, "SELECT ID, DEVICE_ID, PERMISSION, ACCESS_CODE FROM DEVICE_PERMISSION WHERE USER_ID = " . $user_id);
 $json_array = array();
 $count = 0;
 while($row = mysqli_fetch_array($result)){
+	$permission_id = $row['ID'];
 	$device_id = $row['DEVICE_ID'];
 	$permission = $row['PERMISSION'];
 	$access_code = $row['ACCESS_CODE'];
@@ -70,7 +71,7 @@ while($row = mysqli_fetch_array($result)){
 
 	// Send back the device information in JSON format
 	$device_properties = array('id' => $device_id, 'owner' => $username, 'type' => $type, 'status' => $status,
-		'nickname' => $nickname, 'state' => $state, 'permission' => $permission);
+		'nickname' => $nickname, 'state' => $state, 'permission' => $permission, 'permission_id' => $permission_id);
 	if($type == 'L'){
 		$device_properties['access_code'] = $access_code;
 	}

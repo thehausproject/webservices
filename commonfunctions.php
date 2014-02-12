@@ -119,4 +119,15 @@ function validate_administrator($con, $user_id, $device_id){
 	}
 }
 
+function validate_user_token($con, $user_token){
+	$result = mysqli_query($con, "SELECT ID FROM USER WHERE AUTH_TOKEN = '" . $user_token . "'");
+	$user_id = NULL;
+	if($row = mysqli_fetch_array($result)){
+		$user_id = $row['ID'];
+	}else{
+		output_error('Invalid user token');
+	}
+	return $user_id;
+}
+
 ?>
