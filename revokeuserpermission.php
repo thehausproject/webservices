@@ -60,6 +60,8 @@ if($row = mysqli_fetch_array($result)){
 	if($user_permission != 'A'){
 		output_error('User does not have permission to grant access');
 	}
+}else{
+	output_error('User does not have permission to grant access');
 }
 
 // If user is administrator, check that the permission has not expired

@@ -17,6 +17,10 @@ function output_error($errormessage){
 	exit;
 }
 
+function return_success(){
+	echo json_encode(array('result' => 'success'));
+}
+
 function get_day_num($day){
 	$day_nums = array('S' => 0, 'M' => 1, 'T' => 2, 'W' => 3, 
 		'R' => 4, 'F' => 5, 'A' => 6);
@@ -82,6 +86,36 @@ function delete_permission_restrictions($con, $permission_id){
 			}
 		}
 		mysqli_query($con, "DELETE FROM DEVICE_ACCESS WHERE ID = " . $row['ID']);
+	}
+}
+
+function validate_administrator($con, $user_id, $device_id){
+	$user_expiration_date = NULL;
+	$result = mysqli_query($con, "SELECT PERMISSION, ACCESS_EXPIRATION_DATE FROM DEVICE_PERMISSION WHERE USER_ID = '" . $user_id . 
+		"' AND DEVICE_ID = '" . $device_id . "'");
+	$user_permission = NULL;
+	$user_expiration_date = NULL;
+	if($row = mysqli_fetch_array($result)){
+		$user_permission = $row['PERMISSION'];
+		$user_expiration_date = $row['ACCESS_EXPIRATION_DATE'];
+		if($user_permission != 'A'){
+			output_error('User does not have permission to grant access');
+		}
+	}else{
+		output_error('User does not have permission to grant access');
+	}
+
+	// If user is administrator, check that the permission has not expired
+	$current_date = NULL;
+	if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiration_date != '0000-00-00'){
+		$expiration_date_obj = new DateTime($user_expiration_date);
+		$current_date = new DateTime("now");
+		if($current_date > $expiration_date_obj){
+			// And update permission in table to 'E' for expired
+			mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE USER_ID = '" . $user_id .
+				"' AND DEVICE_ID = '" . $device_id . "')");
+			output_error('User does not have permission to grant access');
+		}
 	}
 }
 
