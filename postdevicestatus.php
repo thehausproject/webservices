@@ -65,6 +65,11 @@ if($status != 'U' && $status != 'D' && $status != 'L'){
 	output_error('Invalid status provided');
 }
 
+// Check to make sure no access restrictions prevent this
+if(!can_access_now($con, $device_permission_id)){
+	output_error('Access is restricted at this time');
+}
+
 // Update the device status
 mysqli_query($con, "UPDATE DEVICE SET STATUS = '" . $status . "' WHERE ID = " . $device_id);
 echo json_encode(array('result' => 'success'));

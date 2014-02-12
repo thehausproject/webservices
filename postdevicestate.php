@@ -67,6 +67,11 @@ if($row = mysqli_fetch_array($result)){
 	output_error('No permission granted to this user');
 }
 
+// Check to make sure no access restrictions prevent this
+if(!can_access_now($con, $device_permission_id)){
+	output_error('Access is restricted at this time');
+}
+
 // Update the device state
 mysqli_query($con, "UPDATE DEVICE SET STATE = '" . $state . "' WHERE ID = " . $device_id);
 echo json_encode(array('result' => 'success'));

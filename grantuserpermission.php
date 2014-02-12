@@ -75,6 +75,8 @@ if($row = mysqli_fetch_array($result)){
 	if($user_permission != 'A'){
 		output_error('User does not have permission to grant access');
 	}
+}else{
+	output_error('User does not have permission to grant access');
 }
 
 // If user is administrator, check that the permission has not expired
@@ -152,26 +154,28 @@ if($device_type == 'L'){
 if($isupdate){
 	mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = '" . $permission_level . "', ACCESS_EXPIRATION_DATE = '" .
 	$expiration_date . "', ACCESS_GRANTED_BY = " . $user_id . ", ACCESS_CODE = '" . $access_code . "' WHERE ID = " . $id);
-	echo json_encode(array('result' => 'success'));
-	exit;
-}
-
-// Finally.  If we made it this far it means that the device permission is ready to be written.
-$insert_query = "INSERT INTO DEVICE_PERMISSION (USER_ID, DEVICE_ID, PERMISSION, ACCESS_EXPIRATION_DATE, 
-	ACCESS_GRANTED_BY, ACCESS_CODE) VALUES (" . $granted_user_id . ", " . $device_id . ", '" . $permission_level .
-	"', '" . $expiration_date . "', " . $user_id . ", ";
-if($access_code == "NULL"){
-	$insert_query = $insert_query . $access_code;
 }else{
-	$insert_query = $insert_query . "'" . $access_code . "'";
+
+	// Execute this code if the permission is new
+	$insert_query = "INSERT INTO DEVICE_PERMISSION (USER_ID, DEVICE_ID, PERMISSION, ACCESS_EXPIRATION_DATE, 
+		ACCESS_GRANTED_BY, ACCESS_CODE) VALUES (" . $granted_user_id . ", " . $device_id . ", '" . $permission_level .
+		"', '" . $expiration_date . "', " . $user_id . ", ";
+	if($access_code == "NULL"){
+		$insert_query = $insert_query . $access_code;
+	}else{
+		$insert_query = $insert_query . "'" . $access_code . "'";
+	}
+	$insert_query = $insert_query . ")";
+	mysqli_query($con, $insert_query);
 }
-$insert_query = $insert_query . ")";
-mysqli_query($con, $insert_query);
 
 // Create a device access record for this permission with all access granted by default
+// Check 0 condition, as we don't want to create a new record for a permission update
 $permission_id = mysqli_insert_id($con);
-$insert_query = "INSERT INTO DEVICE_ACCESS (DEVICE_PERMISSION_ID, ALL_ACCESS) VALUES (". $permission_id . ", 1)";
-mysqli_query($insert_query);
+if($permission_id != 0){
+	$insert_query = "INSERT INTO DEVICE_ACCESS (DEVICE_PERMISSION_ID, ALL_ACCESS) VALUES (". $permission_id . ", 1)";
+	mysqli_query($con, $insert_query);
+}
 
 echo json_encode(array('result' => 'success'));
 

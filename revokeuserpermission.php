@@ -3,7 +3,7 @@
 /*
 Title:	Revoke User Permission
 Author:	Dylan Boltz
-Date:	2/8/2013
+Date:	2/8/2014
 
 The purpose of this code is to revoke a user permission for a device.
 
