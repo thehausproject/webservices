@@ -37,9 +37,12 @@ if($row = mysqli_fetch_array($result)){
 }
 
 // Get access code for this user permission
-$result = mysqli_query($con, "SELECT ACCESS_CODE FROM DEVICE_PERMISSION WHERE DEVICE_ID = '" . $device_id . 
+$result = mysqli_query($con, "SELECT ID, ACCESS_CODE FROM DEVICE_PERMISSION WHERE DEVICE_ID = '" . $device_id . 
 	"' AND ACCESS_CODE = '" . $access_code . "'");
 if($row = mysqli_fetch_array($result)){
+	if(!can_access_now($con, $row['ID']){
+		output_error('Access is restricted at this time');
+	}
 	mysqli_query($con, "UPDATE DEVICE SET STATE = 'UNLOCKED' WHERE ID = '" . $device_id . "'");
 	echo json_encode(array('result' => 'success'));
 }else{
