@@ -16,7 +16,7 @@ $passcode = $_POST['passcode'];
 $type = $_POST['type'];
 
 // Check that parameters are not null
-if(is_null($passcode) || is_null($type)){
+if(empty($passcode) || empty($type)){
 	output_error('Insufficient parameters provided');
 }else if(strlen($passcode) != 16){
 	output_error('Invalid passcode');

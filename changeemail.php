@@ -17,7 +17,7 @@ $new_email = $_POST['new_email'];
 $password = $_POST['password'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($new_email) || is_null($password)){
+if(empty($user_token) || empty($new_email) || empty($password)){
 	output_error('Insufficient parameters provided');
 }
 

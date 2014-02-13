@@ -17,7 +17,7 @@ $old_password = $_POST['old_password'];
 $new_password = $_POST['new_password'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($old_password) || is_null($new_password)){
+if(empty($user_token) || empty($old_password) || empty($new_password)){
 	output_error('Insufficient parameters provided');
 }
 

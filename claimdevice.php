@@ -17,7 +17,7 @@ $passcode = $_POST['passcode'];
 $nickname = $_POST['nickname'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($passcode) || is_null($nickname)){
+if(empty($user_token) || empty($passcode) || empty($nickname)){
 	output_error('Insufficient parameters provided');
 }
 
@@ -53,7 +53,7 @@ if (mysqli_connect_errno($con)){
 	}
 
 	// Update the devicee's owner and nickname
-	if(is_null($owner)){
+	if(empty($owner)){
 		mysqli_query($con, "UPDATE DEVICE SET OWNER = " . intval($user_id) . ", NICKNAME = '" . $nickname .
 			"' WHERE PASSCODE = '" . $passcode . "'");
 	}else{

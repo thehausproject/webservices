@@ -17,7 +17,7 @@ $device_id = $_GET['device_id'];
 $user_token = $_GET['user_token'];
 
 // Check that parameters are not null
-if(is_null($device_id) || is_null($user_token)){
+if(empty($device_id) || empty($user_token)){
 	output_error('Insufficient parameters provided');
 }
 

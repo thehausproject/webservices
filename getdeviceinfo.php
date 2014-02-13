@@ -16,7 +16,7 @@ include 'commonfunctions.php';
 $user_token = $_GET['user_token'];
 
 // Check that parameters are not null
-if(is_null($user_token)){
+if(empty($user_token)){
 	output_error('Insufficient parameters provided');
 }
 

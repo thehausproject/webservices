@@ -107,7 +107,7 @@ function validate_administrator($con, $user_id, $device_id){
 
 	// If user is administrator, check that the permission has not expired
 	$current_date = NULL;
-	if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiration_date != '0000-00-00'){
+	if($user_permission == 'A' && !empty($user_expiration_date) && $user_expiration_date != '0000-00-00'){
 		$expiration_date_obj = new DateTime($user_expiration_date);
 		$current_date = new DateTime("now");
 		if($current_date > $expiration_date_obj){

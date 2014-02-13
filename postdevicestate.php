@@ -17,7 +17,7 @@ $device_id = $_POST['device_id'];
 $state = $_POST['state'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($device_id) || is_null($state)){
+if(empty($user_token) || empty($device_id) || empty($state)){
 	output_error('Insufficient parameters provided');
 }
 

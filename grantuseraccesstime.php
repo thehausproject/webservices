@@ -21,13 +21,13 @@ $endtime = $_POST['endtime'];
 
 // Check that parameters are not null
 // This includes checking that one time has a value and one does not
-if(is_null($user_token) || is_null($days) || is_null($permission_id) || (is_null($starttime) && !is_null($endtime)) ||
-	(is_null($endtime) && !is_null($starttime))){
+if(empty($user_token) || empty($days) || empty($permission_id) || (empty($starttime) && !empty($endtime)) ||
+	(empty($endtime) && !empty($starttime))){
 	output_error('Insufficient parameters provided');
 }
 
 $hastimes = false;
-if(!is_null($starttime) || !is_null($endtime)){
+if(!empty($starttime) || !empty($endtime)){
 	$starttime = intval($starttime);
 	$endtime = intval($endtime);
 	$hastimes = true;
@@ -45,7 +45,7 @@ if($hastimes){
 // Check that all days are valid
 $split_days = str_split($days);
 foreach($split_days as $day){
-	if(is_null(get_day_num($day))){
+	if(empty(get_day_num($day))){
 		output_error('A character exists in days that is invalid');
 	}
 }
@@ -103,7 +103,7 @@ if($row = mysqli_fetch_array($result)){
 
 // If user is administrator, check that the permission has not expired
 $current_date = NULL;
-if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiration_date != '0000-00-00'){
+if($user_permission == 'A' && !empty($user_expiration_date) && $user_expiration_date != '0000-00-00'){
 	$expiration_date_obj = new DateTime($user_expiration_date);
 	$current_date = new DateTime("now");
 	if($current_date > $expiration_date_obj){

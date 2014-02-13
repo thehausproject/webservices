@@ -20,17 +20,17 @@ $expiration_date = $_POST['expiration_date'];
 $access_code = $_POST['access_code'];
 
 // Check that parameters are not null
-if(is_null($username) || is_null($user_token) || is_null($device_id) || 
-	is_null($permission_level)){
+if(empty($username) || empty($user_token) || empty($device_id) || 
+	empty($permission_level)){
 	output_error('Insufficient parameters provided');
 }
 
 // Check if the optional arguments are null so that the NULL string
 //	value may be substituted easily in the insert query
-if(is_null($expiration_date)){
+if(empty($expiration_date)){
 	$expiration_date = "NULL";
 }
-if(is_null($access_code)){
+if(empty($access_code)){
 	$access_code = "NULL";
 }
 
@@ -81,7 +81,7 @@ if($row = mysqli_fetch_array($result)){
 
 // If user is administrator, check that the permission has not expired
 $current_date = NULL;
-if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiration_date != '0000-00-00'){
+if($user_permission == 'A' && !empty($user_expiration_date) && $user_expiration_date != '0000-00-00'){
 	$expiration_date_obj = new DateTime($user_expiration_date);
 	$current_date = new DateTime("now");
 	if($current_date > $expiration_date_obj){
@@ -93,7 +93,7 @@ if($user_permission == 'A' && !is_null($user_expiration_date) && $user_expiratio
 }
 
 // If user granting access is not administrator, check that the user owns the device
-if(is_null($user_permission)){
+if(empty($user_permission)){
 	if(intval($user_id) != intval($device_owner)){
 		output_error('User does not have permission to grant access');
 	}

@@ -16,7 +16,7 @@ $user_token = $_GET['user_token'];
 $permission_id = $_GET['permission_id'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($permission_id)){
+if(empty($user_token) || empty($permission_id)){
 	output_error('Insufficient parameters provided');
 }
 

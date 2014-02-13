@@ -16,7 +16,7 @@ $passcode = $_POST['passcode'];
 $access_code = $_POST['access_code'];
 
 // Check that parameters are not null
-if(is_null($passcode) || is_null($access_code)){
+if(empty($passcode) || empty($access_code)){
 	output_error('Insufficient parameters provided');
 }
 

@@ -15,7 +15,7 @@ include 'commonfunctions.php';
 $passcode = $_GET['passcode'];
 
 // Check that parameters are not null
-if(is_null($passcode)){
+if(empty($passcode)){
 	output_error('Insufficient parameters provided');
 }
 

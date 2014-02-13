@@ -17,7 +17,7 @@ $username = $_POST['username'];
 $password = $_POST['password'];
 
 // Check that parameters are not null
-if(is_null($username) || is_null($password)){
+if(empty($username) || empty($password)){
 	output_error('Insufficient parameters provided');
 }
 

@@ -18,7 +18,7 @@ $user_token = $_POST['user_token'];
 $password = $_POST['password'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($password)){
+if(empty($user_token) || empty($password)){
 	output_error('Insufficient parameters provided');
 }
 

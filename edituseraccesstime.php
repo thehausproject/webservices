@@ -20,13 +20,13 @@ $endtime = $_POST['endtime'];
 
 // Check that parameters are not null
 // This includes checking that one time has a value and one does not
-if(is_null($user_token) || is_null($days) || is_null($access_day_id) || (is_null($starttime) && !is_null($endtime)) ||
-	(is_null($endtime) && !is_null($starttime))){
+if(empty($user_token) || empty($days) || empty($access_day_id) || (empty($starttime) && !empty($endtime)) ||
+	(empty($endtime) && !empty($starttime))){
 	output_error('Insufficient parameters provided');
 }
 
 $hastimes = false;
-if(!is_null($starttime) || !is_null($endtime)){
+if(!empty($starttime) || !empty($endtime)){
 	$starttime = intval($starttime);
 	$endtime = intval($endtime);
 	$hastimes = true;
@@ -68,7 +68,7 @@ if($hastimes){
 // Check that all days are valid
 $split_days = str_split($days);
 foreach($split_days as $day){
-	if(is_null(get_day_num($day))){
+	if(empty(get_day_num($day))){
 		output_error('A character exists in days that is invalid');
 	}
 }

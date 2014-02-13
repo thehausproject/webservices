@@ -16,7 +16,7 @@ $user_token = $_POST['user_token'];
 $access_day_id = $_POST['access_day_id'];
 
 // Check that parameters are not null
-if(is_null($user_token) || is_null($access_day_id)){
+if(empty($user_token) || empty($access_day_id)){
 	output_error('Insufficient parameters provided');
 }
 

@@ -17,7 +17,7 @@ $user_token = $_POST['user_token'];
 $new_nickname = $_POST['new_nickname'];
 
 // Check that parameters are not null
-if(is_null($device_id) || is_null($user_token) || is_null($new_nickname)){
+if(empty($device_id) || empty($user_token) || empty($new_nickname)){
 	output_error('Insufficient parameters provided');
 }
 

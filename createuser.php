@@ -23,7 +23,7 @@ $email = $_POST['email'];
 
 
 // Check that parameters are not null
-if(is_null($username) || is_null($password) || is_null($email)){
+if(empty($username) || empty($password) || empty($email)){
 	output_error('Insufficient parameters provided');
 }
 
