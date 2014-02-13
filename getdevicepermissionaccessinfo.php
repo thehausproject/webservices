@@ -1,7 +1,7 @@
 <?php
 
 /*
-Title:	Get User Access Time
+Title:	Get Device Permission Access Info
 Author:	Dylan Boltz
 Date:	2/12/2014
 

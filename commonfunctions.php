@@ -99,10 +99,10 @@ function validate_administrator($con, $user_id, $device_id){
 		$user_permission = $row['PERMISSION'];
 		$user_expiration_date = $row['ACCESS_EXPIRATION_DATE'];
 		if($user_permission != 'A'){
-			output_error('User does not have permission to grant access');
+			output_error('User does not have permission');
 		}
 	}else{
-		output_error('User does not have permission to grant access');
+		output_error('User does not have permission');
 	}
 
 	// If user is administrator, check that the permission has not expired
@@ -114,7 +114,7 @@ function validate_administrator($con, $user_id, $device_id){
 			// And update permission in table to 'E' for expired
 			mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE USER_ID = '" . $user_id .
 				"' AND DEVICE_ID = '" . $device_id . "')");
-			output_error('User does not have permission to grant access');
+			output_error('User does not have permission');
 		}
 	}
 }
