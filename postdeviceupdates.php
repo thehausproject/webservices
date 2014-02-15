@@ -12,8 +12,8 @@ The purpose of this code is to for a device to post updates about its current st
 include 'commonfunctions.php';
 
 // Get Query Parameters
-$passcode = $_POST['passcode'];
-$access_code = $_POST['access_code'];
+$passcode = $_GET['passcode'];
+$access_code = $_GET['access_code'];
 
 // Check that parameters are not null
 if(empty($passcode) || empty($access_code)){
@@ -40,7 +40,7 @@ if($row = mysqli_fetch_array($result)){
 $result = mysqli_query($con, "SELECT ID, ACCESS_CODE FROM DEVICE_PERMISSION WHERE DEVICE_ID = '" . $device_id . 
 	"' AND ACCESS_CODE = '" . $access_code . "'");
 if($row = mysqli_fetch_array($result)){
-	if(!can_access_now($con, $row['ID']){
+	if(!can_access_now($con, $row['ID'])){
 		output_error('Access is restricted at this time');
 	}
 	mysqli_query($con, "UPDATE DEVICE SET STATE = 'UNLOCKED' WHERE ID = '" . $device_id . "'");

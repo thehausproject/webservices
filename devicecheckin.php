@@ -47,6 +47,6 @@ if($device_type == 'L'){
 	}
 }
 
-mysqli_query($con, "UPDATE DEVICE SET LAST_CHECKIN = NOW() WHERE ID = '" . $device_id . "'");
+mysqli_query($con, "UPDATE DEVICE SET LAST_CHECKIN = NOW(), STATUS = 'U' WHERE ID = '" . $device_id . "'");
 
 ?>

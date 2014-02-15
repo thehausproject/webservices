@@ -64,6 +64,12 @@ if($row = mysqli_fetch_array($result)){
 	output_error('Invalid device ID');
 }
 
+// Check if user owns device
+$is_owner = false;
+if(intval($user_id) == intval($device_owner)){
+	$is_owner = true;
+}
+
 // Check if user granting permission is administrator
 $result = mysqli_query($con, "SELECT PERMISSION, ACCESS_EXPIRATION_DATE FROM DEVICE_PERMISSION WHERE USER_ID = '" . $user_id . 
 	"' AND DEVICE_ID = '" . $device_id . "'");
@@ -72,11 +78,13 @@ $user_expiration_date = NULL;
 if($row = mysqli_fetch_array($result)){
 	$user_permission = $row['PERMISSION'];
 	$user_expiration_date = $row['ACCESS_EXPIRATION_DATE'];
-	if($user_permission != 'A'){
+	if($user_permission != 'A' && !$is_owner){
 		output_error('User does not have permission to grant access');
 	}
 }else{
-	output_error('User does not have permission to grant access');
+	if(!$is_owner){
+		output_error('User does not have permission to grant access');
+	}
 }
 
 // If user is administrator, check that the permission has not expired
@@ -88,13 +96,6 @@ if($user_permission == 'A' && !empty($user_expiration_date) && $user_expiration_
 		// And update permission in table to 'E' for expired
 		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE USER_ID = '" . $user_id .
 			"' AND DEVICE_ID = '" . $device_id . "')");
-		output_error('User does not have permission to grant access');
-	}
-}
-
-// If user granting access is not administrator, check that the user owns the device
-if(empty($user_permission)){
-	if(intval($user_id) != intval($device_owner)){
 		output_error('User does not have permission to grant access');
 	}
 }

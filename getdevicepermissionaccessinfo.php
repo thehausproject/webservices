@@ -29,7 +29,7 @@ if (mysqli_connect_errno($con)){
 }
 
 // Validate the user token and permission ID
-// Also validates that user owns this permission
+// Also validates that user has permission to see the restrictions
 $user_id = validate_user_token($con, $user_token);
 $device_all_access = NULL;
 $device_access_id = NULL;
@@ -43,7 +43,14 @@ if($row = mysqli_fetch_array($result)){
 $result = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE ID = " . $permission_id .
 	" AND USER_ID = " . $user_id);
 if(!($row = mysqli_fetch_array($result))){
-	output_error('This permission does not pertain to this user');
+	$result2 = mysqli_query($con, "SELECT DEVICE_ID FROM DEVICE_PERMISSION WHERE ID = " . $permission_id);
+	$row2 = mysqli_fetch_array($result2);
+	$device_id = $row2['DEVICE_ID'];
+	$result2 = mysqli_query($con, "SELECT ID FROM DEVICE_PERMISSION WHERE DEVICE_ID = " . $device_id . 
+		" AND USER_ID = " . $user_id . " AND PERMISSION = 'A'");
+	if(!($row3 = mysqli_fetch_array($result2))){
+		output_error('This permission does not pertain to this user');
+	}
 }
 
 // Gather access restriction information for the permission ID provided

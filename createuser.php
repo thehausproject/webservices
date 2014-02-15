@@ -48,7 +48,7 @@ if (mysqli_connect_errno($con)){
 		$result = mysqli_query($con, $insert_query);
 
 		// Returns the user authorization token.
-		echo json_encode(array('auth_key' => $auth_key));
+		echo json_encode(array('user_token' => $auth_key));
 	}
 }
 
