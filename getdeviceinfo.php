@@ -38,7 +38,7 @@ if($row = mysqli_fetch_array($result)){
 }
 
 // Get the devices that the user has permissions for and return this device information
-$result = mysqli_query($con, "SELECT ID, DEVICE_ID, PERMISSION, ACCESS_CODE FROM DEVICE_PERMISSION WHERE USER_ID = " . $user_id);
+$result = mysqli_query($con, "SELECT ID, DEVICE_ID, PERMISSION, ACCESS_EXPIRATION_DATE, ACCESS_CODE FROM DEVICE_PERMISSION WHERE USER_ID = " . $user_id);
 $json_array = array();
 $count = 0;
 while($row = mysqli_fetch_array($result)){
@@ -62,11 +62,16 @@ while($row = mysqli_fetch_array($result)){
 
 	// Check that the device has checked in within the past two seconds and mark it as offline if it hasn't.
 	$current_date = new DateTime("now");
-	$interval = $current_date - $last_checkin;
+	$interval = intval($current_date) - $last_checkin;
 	$seconds_diff = round((((($interval % 604800) % 86400) % 3600) % 60), 2);
 	if($status != 'D' && abs($seconds_diff) > 2){
 		mysqli_query($con, "UPDATE DEVICE SET STATUS = 'D' WHERE ID = '" . $device_id . "'");
 		$status = 'D';
+	}
+
+	if(is_expired($con, $row['ACCESS_EXPIRATION_DATE'])){
+		$permission = 'E';
+		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE ID = " . $permission_id);
 	}
 
 	// Send back the device information in JSON format

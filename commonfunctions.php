@@ -130,4 +130,18 @@ function validate_user_token($con, $user_token){
 	return $user_id;
 }
 
+function is_expired($con, $expiration_date){
+	if(!empty($expiration_date) && $expiration_date != '0000-00-00'){
+		if(preg_match('#^(?P<year>\d{2}|\d{4})([- /.])(?P<month>\d{1,2})\2(?P<day>\d{1,2})$#', $expiration_date, $matches)
+		           && checkdate($matches['month'],$matches['day'],$matches['year'])){
+			$expiration_date_obj = new DateTime($expiration_date);
+			$current_date = new DateTime("now");
+			if($current_date > $expiration_date_obj){
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 ?>

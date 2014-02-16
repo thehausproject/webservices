@@ -58,10 +58,10 @@ if($row = mysqli_fetch_array($result)){
 	$user_permission = $row['PERMISSION'];
 	$user_expiration_date = $row['ACCESS_EXPIRATION_DATE'];
 	if($user_permission != 'A'){
-		output_error('User does not have permission to grant access');
+		output_error('User does not have permission to revoke access');
 	}
 }else{
-	output_error('User does not have permission to grant access');
+	output_error('User does not have permission to revoke access');
 }
 
 // If user is administrator, check that the permission has not expired
@@ -73,7 +73,7 @@ if($user_permission == 'A' && !empty($user_expiration_date) && $user_expiration_
 		// And update permission in table to 'E' for expired
 		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE USER_ID = '" . $user_id .
 			"' AND DEVICE_ID = '" . $device_id . "')");
-		output_error('User does not have permission to grant access');
+		output_error('User does not have permission to revoke access');
 	}
 }
 

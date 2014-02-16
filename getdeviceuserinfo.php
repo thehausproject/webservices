@@ -81,6 +81,12 @@ while($row = mysqli_fetch_array($result)){
 		$granted_by_username = "User does not exist";
 	}
 
+	// Check that permission is not expired
+	if(is_expired($con, $access_expiration_date)){
+		$permission = 'E';
+		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE ID = " . $permission_id);
+	}
+
 	array_push($json_array, array('id' => $permission_id, 'user' => $username, 'permission' => $permission,
 		'date_authorized' => $date_authorized, 'access_expiration_date' => $access_expiration_date,
 		'access_granted_by' => $granted_by_username));

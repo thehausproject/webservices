@@ -52,7 +52,7 @@ if($row = mysqli_fetch_array($result)){
 }
 
 // Verify that a permission exists for the user making the request
-$result = mysqli_query($con, "SELECT ID, PERMISSION FROM DEVICE_PERMISSION WHERE USER_ID = '" . $user_id . 
+$result = mysqli_query($con, "SELECT ID, PERMISSION, ACCESS_EXPIRATION_DATE FROM DEVICE_PERMISSION WHERE USER_ID = '" . $user_id . 
 	"' AND DEVICE_ID = '" . $device_id . "'");
 $device_permission_id = NULL;
 $user_permission = NULL;
@@ -62,6 +62,12 @@ if($row = mysqli_fetch_array($result)){
 	//Check that the user permission is administrator or write
 	if($user_permission != 'A' && $user_permission != 'W'){
 		output_error('Permission level not high enough to perform this action');
+	}
+	//Check that the permission is not expired
+	if(is_expired($con, $row['ACCESS_EXPIRATION_DATE'])){
+		$permission = 'E';
+		mysqli_query($con, "UPDATE DEVICE_PERMISSION SET PERMISSION = 'E' WHERE ID = " . $device_permission_id);
+		output_error('Permission is expired');
 	}
 }else{
 	output_error('No permission granted to this user');
