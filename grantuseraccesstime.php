@@ -45,7 +45,8 @@ if($hastimes){
 // Check that all days are valid
 $split_days = str_split($days);
 foreach($split_days as $day){
-	if(empty(get_day_num($day))){
+	$day_num = get_day_num($day);
+	if(is_null($day_num)){
 		output_error('A character exists in days that is invalid');
 	}
 }

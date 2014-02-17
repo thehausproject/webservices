@@ -73,7 +73,7 @@ while($row = mysqli_fetch_array($result)){
 	}
 
 	// Get the username of the user who created the permission using access_granted_by
-	$user_info = mysqli_query($con, "SELECT USERNAME FROM USER WHERE ID = " . $user_id);
+	$user_info = mysqli_query($con, "SELECT USERNAME FROM USER WHERE ID = " . $access_granted_by);
 	$granted_by_username = NULL;
 	if($row_next = mysqli_fetch_array($user_info)){
 		$granted_by_username = $row_next['USERNAME'];

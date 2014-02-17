@@ -64,7 +64,7 @@ while($row = mysqli_fetch_array($result)){
 	$current_date = new DateTime("now");
 	$interval = intval($current_date) - $last_checkin;
 	$seconds_diff = round((((($interval % 604800) % 86400) % 3600) % 60), 2);
-	if($status != 'D' && abs($seconds_diff) > 2){
+	if($status != 'D' && abs($seconds_diff) > 6){
 		mysqli_query($con, "UPDATE DEVICE SET STATUS = 'D' WHERE ID = '" . $device_id . "'");
 		$status = 'D';
 	}
