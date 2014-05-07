@@ -41,11 +41,10 @@ if (mysqli_connect_errno($con)){
 	}else{
 		output_error('User token is invalid');
 	}
-
-	
-	mysqli_query($con, "INSERT INTO DEVICE (OWNER, TYPE, STATUS, NICKNAME) VALUES (" . $user_id . ", 'V', 'U', '" . $nickname . "')");
+	$this_query = "INSERT INTO DEVICE (OWNER, TYPE, STATUS, NICKNAME) VALUES (" . $user_id . ", 'V', 'U', '" . $nickname . "')";
+	mysqli_query($con, $this_query);
 	$device_id = mysqli_insert_id($con);
-
+	
 	// Make the entry for this video device in the video device table
 	mysqli_query($con, "INSERT INTO VIDEO_DEVICE (DEVICE_ID, IP_ADDRESS, PORT, USERNAME, PASSWORD) VALUES (" . $device_id . ", '" . 
 		$ip_address . "', " . $port . ", '" . $d_username . "', '" . $d_password . "')");
